@@ -19,6 +19,12 @@ deadline-event/
 ├── UnmapAllDrive/
 │   ├── UnmapAllDrive.py
 │   └── UnmapAllDrive.param
+├── NukeCleanup/
+│   ├── NukeCleanup.py
+│   └── NukeCleanup.param
+├── SetJobsEnv/
+│   ├── SetJobsEnv.py
+│   └── SetJobsEnv.param
 └── _backup/                # Old versions — do not touch
 ```
 
@@ -84,6 +90,20 @@ Fires on Worker events: `OnSlaveIdle`, `OnSlaveStopped`, `OnSlaveStalled`, `OnMa
 Runs `net use /del /y *` on the worker machine to unmap all network drives. Skips if `UserFilter` is empty; runs for all users if `*`; otherwise filters by comma-separated username list (matched against `os.getlogin()`).
 
 Note: uses specific imports (`from Deadline.Events import DeadlineEventListener`) not wildcard — do not change, it works.
+
+## NukeCleanup
+
+Fires on `OnSlaveStartingJob` and/or `OnJobFinished` for jobs whose `PluginName` contains `"Nuke"`.
+
+Deletes all `.tmp` files in each of the job's output directories. Uses `OnSlaveStartingJob` instead of `OnJobStarted` as a workaround for `OnJobStarted` not firing reliably.
+
+**Config:** `CleanTmpFilesEvent` enum — `On Job Started` / `On Job Finished` / `On Job Started and On Job Finished`
+
+## SetJobsEnv
+
+Fires on `OnJobSubmitted` for all jobs. Injects environment variables into the job's environment at submit time.
+
+**Config:** `EnvKeys` — semicolon-separated `KEY=VALUE` pairs (e.g. `OCIO=/path/to/config.ocio;MY_VAR=1`). Uses `job.SetJobEnvironmentKeyValue()` + `RepositoryUtils.SaveJob()`.
 
 ## .param File Format
 
