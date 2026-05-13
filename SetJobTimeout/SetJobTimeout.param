@@ -1,0 +1,94 @@
+[State]
+Type=Enum
+Category=Options
+CategoryOrder=0
+CategoryIndex=1
+Items=Global Enabled;Opt-In;Disabled
+Label=State
+Default=Disabled
+Description=How this event plug-in should respond to events. If Global, all jobs and slaves will trigger the events for this plugin. If Opt-In, jobs and slaves can choose to trigger the events for this plugin. If Disabled, no events are triggered for this plugin.
+
+[AllowedSoftware]
+Type=string
+Category=Options
+CategoryOrder=0
+CategoryIndex=2
+Label=Allowed Software (comma-separated)
+Default=MayaBatch,MayaCmd,CommandLine
+Description=List of Deadline plugin names to apply timeout settings to. Separate multiple entries with commas, e.g. MayaBatch,MayaCmd,CommandLine
+
+[MaxHour]
+Type=integer
+Category=Maximum Render Time (Timeout)
+CategoryOrder=1
+CategoryIndex=1
+Label=Hours
+Default=0
+Description=Maximum hours a task is allowed to render before timeout.
+Maximum=999
+Minimum=0
+
+[MaxMinute]
+Type=integer
+Category=Maximum Render Time (Timeout)
+CategoryOrder=1
+CategoryIndex=2
+Label=Minutes
+Default=0
+Description=Maximum minutes a task is allowed to render before timeout.
+Maximum=59
+Minimum=0
+
+[MaxSecond]
+Type=integer
+Category=Maximum Render Time (Timeout)
+CategoryOrder=1
+CategoryIndex=3
+Label=Seconds
+Default=0
+Description=Maximum seconds a task is allowed to render before timeout.
+Maximum=59
+Minimum=0
+
+[MinHour]
+Type=integer
+Category=Minimum Render Time
+CategoryOrder=2
+CategoryIndex=1
+Label=Hours
+Default=0
+Description=Minimum hours a task must render before it can be considered timed out.
+Maximum=999
+Minimum=0
+
+[MinMinute]
+Type=integer
+Category=Minimum Render Time
+CategoryOrder=2
+CategoryIndex=2
+Label=Minutes
+Default=0
+Description=Minimum minutes a task must render before it can be considered timed out.
+Maximum=59
+Minimum=0
+
+[MinSecond]
+Type=integer
+Category=Minimum Render Time
+CategoryOrder=2
+CategoryIndex=3
+Label=Seconds
+Default=5
+Description=Minimum seconds a task must render before it can be considered timed out.
+Maximum=59
+Minimum=0
+
+[DoTask]
+Type=Enum
+Category=Options
+CategoryOrder=3
+CategoryIndex=1
+Items=Error;Notify;Requeue;Fail;Complete
+Label=On Task Timeout
+Default=Requeue
+Description=What to do when a task times out.

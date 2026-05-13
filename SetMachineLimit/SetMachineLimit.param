@@ -1,0 +1,36 @@
+[State]
+Type=Enum
+Category=Options
+CategoryOrder=0
+CategoryIndex=0
+Items=Global Enabled;Opt-In;Disabled
+Label=State
+Default=Disabled
+Description=Enable or disable this event plugin
+
+[ActiveJobThreshold]
+Type=Integer
+Category=Options
+CategoryOrder=0
+CategoryIndex=1
+Label=Active Job Threshold
+Default=10
+Description=Number of active jobs that must be exceeded before applying machine limit
+
+[JobPriorityThreshold]
+Type=Integer
+Category=Options
+CategoryOrder=0
+CategoryIndex=2
+Label=Job Priority Threshold
+Default=50
+Description=Jobs with priority above this value will get MachineLimitMaximum set to the high value; jobs below this value will get MachineLimitMaximum set to 0
+
+[MachineLimitMaximumHigh]
+Type=Integer
+Category=Options
+CategoryOrder=0
+CategoryIndex=3
+Label=Machine Limit Maximum (High Priority)
+Default=35
+Description=MachineLimitMaximum value to set when active jobs exceed threshold AND job priority is above the threshold
