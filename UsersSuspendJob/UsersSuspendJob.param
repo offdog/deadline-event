@@ -1,0 +1,17 @@
+[State]
+Type=Enum
+Values=Global Enabled;Global Disabled;Opt-In;Opt-Out
+Label=Event State
+Category=Options
+CategoryIndex=0
+Default=Global Enabled
+Description=When this event plugin is active
+
+[SuspendUsers]
+Type=string
+Label=Suspend Users
+Category=Options
+CategoryOrder=0
+Index=1
+Default=dvisual
+Description=Comma-separated list of usernames whose jobs will be suspended immediately on submission (e.g. dvisual,offu).

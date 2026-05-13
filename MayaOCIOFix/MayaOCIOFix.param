@@ -1,0 +1,36 @@
+[About]
+Value=Patches <MAYA_RESOURCES> in OCIOConfigFile on Maya/MayaBatch job submission
+
+[State]
+Type=Enum
+Values=Global Enabled;Global Disabled;Opt-In;Opt-Out
+Label=Event State
+Category=Options
+CategoryIndex=0
+Default=Global Enabled
+Description=When this event plugin is active
+
+[MayaVersion]
+Type=String
+Label=Maya Version
+Category=Maya OCIO Settings
+CategoryIndex=1
+Default=2025
+Description=Maya version number(s) comma-separated (e.g. 2025, 2025,2026). Used for OCIO path and AbortOnError version filter.
+
+[MayaInstallBasePath]
+Type=String
+Label=Maya Install Base Path
+Category=Maya OCIO Settings
+CategoryIndex=2
+Default=C:/Program Files/Autodesk
+Description=Base path where Autodesk apps are installed. MayaVersion is appended automatically.
+
+[AbortOnError]
+Type=Enum
+Values=Unchanged;Enable;Disable
+Label=Abort On Error
+Category=Arnold Settings
+CategoryIndex=3
+Default=Disable
+Description=Override Arnold Abort On Error ตอน submit. Unchanged = ไม่แตะ. ใช้งานเฉพาะ job ที่ Maya version ตรงกับ MayaVersion
