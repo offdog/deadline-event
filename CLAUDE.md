@@ -5,11 +5,20 @@
 ```
 deadline-event/
 ├── MayaOCIOFix/
-│   ├── MayaOCIOFix.py      # Event plugin logic
-│   └── MayaOCIOFix.param   # Config UI definition for Deadline Monitor
+│   ├── MayaOCIOFix.py
+│   └── MayaOCIOFix.param
 ├── UsersSuspendJob/
 │   ├── UsersSuspendJob.py
 │   └── UsersSuspendJob.param
+├── SetJobTimeout/
+│   ├── SetJobTimeout.py
+│   └── SetJobTimeout.param
+├── SetMachineLimit/
+│   ├── SetMachineLimit.py
+│   └── SetMachineLimit.param
+├── UnmapAllDrive/
+│   ├── UnmapAllDrive.py
+│   └── UnmapAllDrive.param
 └── _backup/                # Old versions — do not touch
 ```
 
@@ -28,10 +37,11 @@ Copy each plugin folder to:
   from Deadline.Events import *
   from Deadline.Scripting import *
   ```
-- Read plugin config with `self.GetConfigEntryWithDefault("Key", "default")`
+- Read plugin config with `self.GetConfigEntryWithDefault("Key", "default")` (string) or `self.GetIntegerConfigEntryWithDefault("Key", default)` (int)
 - Read/write job plugin info with `job.GetJobPluginInfoKeyValue()` / `job.SetJobPluginInfoKeyValue()`
 - Persist job changes with `RepositoryUtils.SaveJob(job)`
 - Hook callbacks via `+=` on the callback attribute; delete with `del` in `CleanUp`
+- Worker/Slave callbacks receive `(slave, slaveInfo)` args; job callbacks receive `(job)`
 
 ## MayaOCIOFix
 
@@ -51,12 +61,36 @@ Fires on `OnJobSubmitted` for `MayaBatch` and `MayaCmd` jobs.
 
 Fires on `OnJobSubmitted`. Suspends the job immediately if the submitting user is in the `SuspendUsers` config list (comma-separated, case-insensitive).
 
+## SetJobTimeout
+
+Fires on `OnJobSubmitted`. Sets `JobTaskTimeoutSeconds`, `JobMinRenderTimeSeconds`, and `JobOnTaskTimeout` only for jobs whose plugin name is in the `AllowedSoftware` config list.
+
+**Config:** Max/Min timeout broken into Hours/Minutes/Seconds fields; `DoTask` enum (Error/Notify/Requeue/Fail/Complete).
+
+## SetMachineLimit
+
+Fires on `OnJobSubmitted`, `OnJobStarted`, `OnJobResumed`, `OnJobRequeued`.
+
+Dynamically sets `MachineLimitMaximum` based on current active job count vs threshold:
+- active jobs > `ActiveJobThreshold` AND priority > `JobPriorityThreshold` → set limit to `MachineLimitMaximumHigh`
+- otherwise → set limit to `0` (unlimited)
+
+Uses `RepositoryUtils.GetJobsInState("Active")` to count live jobs at event time.
+
+## UnmapAllDrive
+
+Fires on Worker events: `OnSlaveIdle`, `OnSlaveStopped`, `OnSlaveStalled`, `OnMachineRestart`.
+
+Runs `net use /del /y *` on the worker machine to unmap all network drives. Skips if `UserFilter` is empty; runs for all users if `*`; otherwise filters by comma-separated username list (matched against `os.getlogin()`).
+
+Note: uses specific imports (`from Deadline.Events import DeadlineEventListener`) not wildcard — do not change, it works.
+
 ## .param File Format
 
 ```ini
 [FieldName]
 Type=Enum|String|Integer|Boolean
-Values=A;B;C          # Enum only
+Values=A;B;C          # Enum only (some plugins use Items= instead)
 Label=Display Name
 Category=Group Name
 CategoryIndex=0

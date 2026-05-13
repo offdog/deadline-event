@@ -14,7 +14,7 @@ Custom event plugins for Thinkbox Deadline render farm.
 
 **Triggers:** `OnJobSubmitted` — เฉพาะ plugin `MayaBatch` และ `MayaCmd`
 
-#### Configuration (Deadline Monitor → Tools → Configure Event Plugins → MayaOCIOFix)
+#### Configuration
 
 | Field | Default | Description |
 |---|---|---|
@@ -52,12 +52,73 @@ Suspend job อัตโนมัติทันทีที่ submit สำห
 
 ---
 
+### SetJobTimeout
+
+ตั้งค่า timeout ของ task อัตโนมัติตอน submit เหมาะสำหรับป้องกัน task ค้างนานเกินไป
+
+**Triggers:** `OnJobSubmitted` — เฉพาะ plugin ที่อยู่ใน `AllowedSoftware`
+
+#### Configuration
+
+| Field | Default | Description |
+|---|---|---|
+| Event State | Disabled | เปิด/ปิด plugin |
+| Allowed Software | `MayaBatch,MayaCmd,CommandLine` | Plugin name ที่ต้องการจัดการ คั่นด้วย comma |
+| Max Hours/Minutes/Seconds | `0` | Maximum render time per task (0 = ไม่จำกัด) |
+| Min Hours/Minutes/Seconds | `0h 0m 5s` | Minimum render time ก่อนที่จะถือว่า timeout |
+| On Task Timeout | `Requeue` | Action เมื่อ timeout: Error / Notify / Requeue / Fail / Complete |
+
+---
+
+### SetMachineLimit
+
+ปรับ `MachineLimitMaximum` อัตโนมัติตาม load ของ farm — จำกัด worker ของ job priority ต่ำเมื่อ farm ยุ่ง
+
+**Triggers:** `OnJobSubmitted`, `OnJobStarted`, `OnJobResumed`, `OnJobRequeued`
+
+#### Logic
+
+| เงื่อนไข | ผลลัพธ์ |
+|---|---|
+| active jobs > threshold **และ** priority > threshold | ตั้ง MachineLimitMaximum = High value |
+| active jobs > threshold **และ** priority ≤ threshold | ตั้ง MachineLimitMaximum = 0 (unlimited) |
+| active jobs ≤ threshold | ตั้ง MachineLimitMaximum = 0 (unlimited) |
+
+#### Configuration
+
+| Field | Default | Description |
+|---|---|---|
+| Event State | Disabled | เปิด/ปิด plugin |
+| Active Job Threshold | `10` | จำนวน active job ที่ถือว่า farm ยุ่ง |
+| Job Priority Threshold | `50` | Priority ที่แบ่ง high/low priority |
+| Machine Limit Maximum (High Priority) | `35` | จำนวน worker สูงสุดสำหรับ high priority job |
+
+---
+
+### UnmapAllDrive
+
+Unmap network drive ทั้งหมดบน worker อัตโนมัติ เพื่อป้องกัน drive letter ค้างหลัง render
+
+**Triggers:** Worker events — `OnSlaveIdle`, `OnSlaveStopped`, `OnSlaveStalled`, `OnMachineRestart`
+
+#### Configuration
+
+| Field | Default | Description |
+|---|---|---|
+| Event State | Disabled | เปิด/ปิด plugin |
+| User Filter | `myrender,renderman,mydeadline` | Username ที่ต้องการ unmap — ใช้ `*` สำหรับทุก user, เว้นว่าง = ไม่ทำงาน |
+
+---
+
 ## Deploy
 
 1. Copy plugin folder ไปที่ Deadline Repository:
    ```
    <DeadlineRepository>/custom/events/MayaOCIOFix/
    <DeadlineRepository>/custom/events/UsersSuspendJob/
+   <DeadlineRepository>/custom/events/SetJobTimeout/
+   <DeadlineRepository>/custom/events/SetMachineLimit/
+   <DeadlineRepository>/custom/events/UnmapAllDrive/
    ```
 
 2. เปิด Deadline Monitor → **Tools → Configure Event Plugins**
@@ -71,5 +132,5 @@ Suspend job อัตโนมัติทันทีที่ submit สำห
 ## Requirements
 
 - Thinkbox Deadline 10+
-- Maya (MayaBatch / MayaCmd) plugin
-- Arnold renderer (สำหรับ AbortOnError feature)
+- Maya (MayaBatch / MayaCmd) plugin — สำหรับ MayaOCIOFix, SetJobTimeout
+- Arnold renderer — สำหรับ AbortOnError feature ใน MayaOCIOFix
