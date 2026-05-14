@@ -1,4 +1,5 @@
 [About]
+Type=Label
 Value=Patches <MAYA_RESOURCES> in OCIOConfigFile on Maya/MayaBatch job submission
 
 [State]

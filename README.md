@@ -14,6 +14,8 @@ Custom event plugins for Thinkbox Deadline render farm.
 
 **Triggers:** `OnJobSubmitted` — เฉพาะ plugin `MayaBatch` และ `MayaCmd`
 
+> **หมายเหตุ:** OCIO patch และ AbortOnError ทำงานอิสระต่อกัน — `AbortOnError` จะถูก apply เสมอสำหรับทุก job ที่ Maya version ตรงกับ config ไม่ว่าจะมี `<MAYA_RESOURCES>` ใน OCIOConfigFile หรือไม่ก็ตาม
+
 #### Configuration
 
 | Field | Default | Description |
@@ -160,6 +162,11 @@ Inject environment variable เข้าไปใน job ตอน submit เห
 4. ดู log ได้ใน Deadline Monitor → **View → Logs → Event Logs**
 
 ---
+
+## Notes
+
+- ทุก section ใน `.param` file ต้องมี `Type=` — ถ้าขาดจะเกิด warning ตอน Deadline โหลด plugin
+- `[About]` ใช้ `Type=Label` + `Value=` สำหรับ read-only display text
 
 ## Requirements
 

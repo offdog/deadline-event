@@ -37,24 +37,20 @@ class MayaOCIOFixEvent(DeadlineEventListener):
         self.LogInfo("[MayaOCIOFix] OCIOConfigFile: '{}'".format(ocioConfigFile))
 
         if not ocioConfigFile:
-            self.LogInfo("[MayaOCIOFix] Skip - OCIOConfigFile is empty")
-            return
+            self.LogInfo("[MayaOCIOFix] Skip OCIO patch - OCIOConfigFile is empty")
+        elif "<MAYA_RESOURCES>" not in ocioConfigFile:
+            self.LogInfo("[MayaOCIOFix] Skip OCIO patch - <MAYA_RESOURCES> not found, no replacement needed")
+        else:
+            mayaInstallBase = self.GetConfigEntryWithDefault(
+                "MayaInstallBasePath", "C:/Program Files/Autodesk"
+            )
+            mayaResourcesPath = "{}/Maya{}/resources".format(mayaInstallBase, jobMayaVersion)
+            self.LogInfo("[MayaOCIOFix] Replacing <MAYA_RESOURCES> with '{}'".format(mayaResourcesPath))
 
-        if "<MAYA_RESOURCES>" not in ocioConfigFile:
-            self.LogInfo("[MayaOCIOFix] Skip - <MAYA_RESOURCES> not found, no replacement needed")
-            return
-
-        mayaInstallBase = self.GetConfigEntryWithDefault(
-            "MayaInstallBasePath", "C:/Program Files/Autodesk"
-        )
-        mayaResourcesPath = "{}/Maya{}/resources".format(mayaInstallBase, jobMayaVersion)
-        self.LogInfo("[MayaOCIOFix] Replacing <MAYA_RESOURCES> with '{}'".format(mayaResourcesPath))
-
-        newOCIOConfigFile = ocioConfigFile.replace("<MAYA_RESOURCES>", mayaResourcesPath)
-        job.SetJobPluginInfoKeyValue("OCIOConfigFile", newOCIOConfigFile)
-        RepositoryUtils.SaveJob(job)
-
-        self.LogInfo("[MayaOCIOFix] SUCCESS - OCIOConfigFile updated: {} -> {}".format(ocioConfigFile, newOCIOConfigFile))
+            newOCIOConfigFile = ocioConfigFile.replace("<MAYA_RESOURCES>", mayaResourcesPath)
+            job.SetJobPluginInfoKeyValue("OCIOConfigFile", newOCIOConfigFile)
+            RepositoryUtils.SaveJob(job)
+            self.LogInfo("[MayaOCIOFix] SUCCESS - OCIOConfigFile updated: {} -> {}".format(ocioConfigFile, newOCIOConfigFile))
 
         abortOnError = self.GetConfigEntryWithDefault("AbortOnError", "Unchanged")
         self.LogInfo("[MayaOCIOFix] AbortOnError config: {}".format(abortOnError))

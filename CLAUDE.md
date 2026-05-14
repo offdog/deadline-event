@@ -56,10 +56,11 @@ Fires on `OnJobSubmitted` for `MayaBatch` and `MayaCmd` jobs.
 **Logic flow:**
 1. Skip if plugin is not `MayaBatch` / `MayaCmd`
 2. Read job's `Version` plugin info key; skip if not in `MayaVersion` config list
-3. Read `OCIOConfigFile`; skip if empty or `<MAYA_RESOURCES>` not present
-4. Replace `<MAYA_RESOURCES>` with `{MayaInstallBasePath}/Maya{jobVersion}/resources`
-5. Save job
-6. If `AbortOnError != Unchanged`, inject MEL into `PreRenderMel` (appends, does not overwrite)
+3. OCIO patch (independent — runs regardless of AbortOnError):
+   - Read `OCIOConfigFile`; skip patch if empty or `<MAYA_RESOURCES>` not present
+   - Replace `<MAYA_RESOURCES>` with `{MayaInstallBasePath}/Maya{jobVersion}/resources` and save job
+4. AbortOnError (always runs for all version-matched jobs, default `Disable` → set `abortOnError 0`):
+   - If `AbortOnError != Unchanged`, inject MEL into `PreRenderMel` (appends, does not overwrite) and save job
 
 **Key plugin info keys read/written:** `OCIOConfigFile`, `PreRenderMel`, `Version`
 
@@ -109,7 +110,7 @@ Fires on `OnJobSubmitted` for all jobs. Injects environment variables into the j
 
 ```ini
 [FieldName]
-Type=Enum|String|Integer|Boolean
+Type=Enum|String|Integer|Boolean|Label
 Values=A;B;C          # Enum only (some plugins use Items= instead)
 Label=Display Name
 Category=Group Name
@@ -117,3 +118,6 @@ CategoryIndex=0
 Default=value
 Description=Shown in Deadline Monitor UI
 ```
+
+- Every section **must** declare `Type=` — Deadline will warn on load if missing
+- Use `Type=Label` with `Value=` for read-only display fields (e.g. `[About]`)
