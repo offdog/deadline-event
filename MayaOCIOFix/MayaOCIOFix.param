@@ -1,6 +1,6 @@
 [About]
 Type=Label
-Value=Patches <MAYA_RESOURCES> in OCIOConfigFile on Maya/MayaBatch job submission
+Default=Patches <MAYA_RESOURCES> in OCIOConfigFile on Maya/MayaBatch job submission
 
 [State]
 Type=Enum

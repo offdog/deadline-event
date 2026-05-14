@@ -166,7 +166,7 @@ Inject environment variable เข้าไปใน job ตอน submit เห
 ## Notes
 
 - ทุก section ใน `.param` file ต้องมี `Type=` — ถ้าขาดจะเกิด warning ตอน Deadline โหลด plugin
-- `[About]` ใช้ `Type=Label` + `Value=` สำหรับ read-only display text
+- `[About]` ใช้ `Type=Label` + `Default=` สำหรับ read-only display text (`Value=` ไม่ถูก recognize)
 
 ## Requirements
 

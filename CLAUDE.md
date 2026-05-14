@@ -120,4 +120,4 @@ Description=Shown in Deadline Monitor UI
 ```
 
 - Every section **must** declare `Type=` — Deadline will warn on load if missing
-- Use `Type=Label` with `Value=` for read-only display fields (e.g. `[About]`)
+- Use `Type=Label` with `Default=` for read-only display fields (e.g. `[About]`)
