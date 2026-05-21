@@ -7,18 +7,50 @@ CategoryIndex=0
 Default=Global Enabled
 Description=When this event plugin is active
 
-[JobNamePrefix]
+[Prefix1]
 Type=String
-Label=Job Name Prefix
+Label=Prefix 1
 Category=PPI Startup Settings
 CategoryIndex=1
 Default=JJK
-Description=Only process MayaBatch/MayaCmd jobs whose name starts with this prefix (case-sensitive, e.g. JJK)
+Description=Job name prefix #1 (case-sensitive). Leave blank to disable this entry.
 
-[UserSetupMelPath]
+[MelPath1]
 Type=String
-Label=UserSetup MEL Path
+Label=UserSetup MEL Path 1
 Category=PPI Startup Settings
 CategoryIndex=2
 Default=M:/_tech/mayaScript/ppi/jjk/startup/userSetup.mel
-Description=Path to the userSetup.mel file to source via PreRenderMel. Use forward slashes (e.g. M:/_tech/.../userSetup.mel)
+Description=Path to userSetup.mel for Prefix 1. Plugin extracts directory and adds to MAYA_SCRIPT_PATH.
+
+[Prefix2]
+Type=String
+Label=Prefix 2
+Category=PPI Startup Settings
+CategoryIndex=3
+Default=
+Description=Job name prefix #2 (case-sensitive). Leave blank to disable.
+
+[MelPath2]
+Type=String
+Label=UserSetup MEL Path 2
+Category=PPI Startup Settings
+CategoryIndex=4
+Default=
+Description=Path to userSetup.mel for Prefix 2.
+
+[Prefix3]
+Type=String
+Label=Prefix 3
+Category=PPI Startup Settings
+CategoryIndex=5
+Default=
+Description=Job name prefix #3 (case-sensitive). Leave blank to disable.
+
+[MelPath3]
+Type=String
+Label=UserSetup MEL Path 3
+Category=PPI Startup Settings
+CategoryIndex=6
+Default=
+Description=Path to userSetup.mel for Prefix 3.

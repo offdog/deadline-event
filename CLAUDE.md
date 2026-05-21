@@ -111,14 +111,15 @@ Fires on `OnJobSubmitted` for all jobs. Injects environment variables into the j
 
 ## PPIstartup
 
-Fires on `OnJobSubmitted` for `MayaBatch` and `MayaCmd` jobs whose name starts with a configurable prefix (default `JJK`).
+Fires on `OnJobSubmitted` for `MayaBatch` and `MayaCmd` jobs. Supports up to 3 numbered prefix/MEL path pairs (`Prefix1`/`MelPath1` … `Prefix3`/`MelPath3`).
 
 **Logic flow:**
 1. Skip if plugin is not `MayaBatch` / `MayaCmd`
-2. Skip if `job.JobName` does not start with `JobNamePrefix` (case-sensitive)
-3. Append script directory (from `UserSetupMelPath`) to `MAYA_SCRIPT_PATH` job environment — Maya auto-sources `userSetup.mel` from all directories in this path at startup
-4. Auto-set `OutputFilePath` (Plugin Info) to `{ProjectPath}/render/{SceneName}/rev####/` — scans existing `rev\d{4}` subdirs and increments; starts at `rev0001` if none exist
-5. `RepositoryUtils.SaveJob(job)` once at end
+2. Loop entries 1–3: skip if `Prefix{i}` is empty; if `job.JobName.startswith(prefix)` → use `MelPath{i}` (first match wins)
+3. If no prefix matched → skip (return)
+4. Append script directory (extracted from matched `MelPath{i}`) to `MAYA_SCRIPT_PATH` job environment — Maya auto-sources `userSetup.mel` from all directories in this path at startup
+5. Auto-set `OutputFilePath` (Plugin Info) to `{ProjectPath}/render/{SceneName}/rev####/` — scans existing `rev\d{4}` subdirs and increments; starts at `rev0001` if none exist
+6. `RepositoryUtils.SaveJob(job)` once at end
 
 **Key notes:**
 - `SetJobEnvironmentKeyValue` auto-saves immediately (no SaveJob needed for env vars)

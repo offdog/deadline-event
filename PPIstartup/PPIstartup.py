@@ -28,16 +28,24 @@ class PPIstartupEvent(DeadlineEventListener):
             self.LogInfo("[PPIstartup] Skip - Plugin '{}' is not MayaBatch or MayaCmd".format(job.JobPlugin))
             return
 
-        prefix = self.GetConfigEntryWithDefault("JobNamePrefix", "JJK")
-        if not job.JobName.startswith(prefix):
-            self.LogInfo("[PPIstartup] Skip - Job name '{}' does not start with prefix '{}'".format(
-                job.JobName, prefix))
+        # --- Find matching prefix & MEL path ---
+        matchedMelPath = None
+        for i in range(1, 4):
+            prefix = self.GetConfigEntryWithDefault("Prefix{}".format(i), "").strip()
+            if not prefix:
+                continue
+            if job.JobName.startswith(prefix):
+                matchedMelPath = self.GetConfigEntryWithDefault(
+                    "MelPath{}".format(i), "").strip()
+                self.LogInfo("[PPIstartup] Matched prefix '{}' (entry {})".format(prefix, i))
+                break
+
+        if matchedMelPath is None:
+            self.LogInfo("[PPIstartup] Skip - Job name '{}' does not match any prefix".format(job.JobName))
             return
 
         # --- MAYA_SCRIPT_PATH ---
-        melPath = self.GetConfigEntryWithDefault(
-            "UserSetupMelPath", "M:/_tech/mayaScript/ppi/jjk/startup/userSetup.mel")
-        melPath = melPath.replace("\\", "/")
+        melPath = matchedMelPath.replace("\\", "/")
         scriptDir = os.path.dirname(melPath)
 
         existingScriptPath = job.GetJobEnvironmentKeyValue("MAYA_SCRIPT_PATH")
