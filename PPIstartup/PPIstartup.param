@@ -1,0 +1,24 @@
+[State]
+Type=Enum
+Values=Global Enabled;Global Disabled;Opt-In;Opt-Out
+Label=Event State
+Category=Options
+CategoryIndex=0
+Default=Global Enabled
+Description=When this event plugin is active
+
+[JobNamePrefix]
+Type=String
+Label=Job Name Prefix
+Category=PPI Startup Settings
+CategoryIndex=1
+Default=JJK
+Description=Only process MayaBatch/MayaCmd jobs whose name starts with this prefix (case-sensitive, e.g. JJK)
+
+[UserSetupMelPath]
+Type=String
+Label=UserSetup MEL Path
+Category=PPI Startup Settings
+CategoryIndex=2
+Default=M:/_tech/mayaScript/ppi/jjk/startup/userSetup.mel
+Description=Path to the userSetup.mel file to source via PreRenderMel. Use forward slashes (e.g. M:/_tech/.../userSetup.mel)

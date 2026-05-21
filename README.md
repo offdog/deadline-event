@@ -142,6 +142,35 @@ Inject environment variable เข้าไปใน job ตอน submit เห
 
 ---
 
+### PPIstartup
+
+Inject `userSetup.mel` ของ PPI studio เข้า Maya job อัตโนมัติตอน submit และกำหนด output path แบบ auto-increment rev
+
+**Triggers:** `OnJobSubmitted` — เฉพาะ plugin `MayaBatch` และ `MayaCmd` ที่ชื่อ job ขึ้นต้นด้วย prefix ที่กำหนด (default `JJK`)
+
+#### Logic
+
+1. เพิ่ม directory ของ `userSetup.mel` เข้า `MAYA_SCRIPT_PATH` — Maya จะ auto-source `userSetup.mel` จาก directory นั้นตอน startup
+2. กำหนด `OutputFilePath` เป็น `{ProjectPath}/render/{SceneName}/rev####/` โดย scan folder จริงแล้ว auto-increment rev
+
+> **หมายเหตุ:** `OutputDirectory0` (แสดงใน Deadline Monitor) ไม่สามารถเปลี่ยนได้จาก event plugin — เป็น limitation ของ Deadline API แต่ `OutputFilePath` ที่ใช้เป็น `-rd` flag จริงใน MayaCmd ถูกต้อง
+
+#### Configuration
+
+| Field | Default | Description |
+|---|---|---|
+| Event State | Global Enabled | เปิด/ปิด plugin |
+| Job Name Prefix | `JJK` | Prefix ของชื่อ job ที่จะ process (case-sensitive) |
+| UserSetup MEL Path | `M:/_tech/mayaScript/ppi/jjk/startup/userSetup.mel` | Path ไปยัง `userSetup.mel` — plugin จะ extract directory แล้วเพิ่มใน `MAYA_SCRIPT_PATH` |
+
+#### ตัวอย่าง Output Path
+
+Job มี `ProjectPath = M:/JJK`, `SceneFile = shot010.ma`:
+- Submit ครั้งแรก (ยังไม่มี rev) → `OutputFilePath = M:/JJK/render/shot010/rev0001`
+- Submit อีกครั้ง (มี rev0001 อยู่แล้ว) → `OutputFilePath = M:/JJK/render/shot010/rev0002`
+
+---
+
 ## Deploy
 
 1. Copy plugin folder ไปที่ Deadline Repository:
@@ -153,6 +182,7 @@ Inject environment variable เข้าไปใน job ตอน submit เห
    <DeadlineRepository>/custom/events/UnmapAllDrive/
    <DeadlineRepository>/custom/events/NukeCleanup/
    <DeadlineRepository>/custom/events/SetJobsEnv/
+   <DeadlineRepository>/custom/events/PPIstartup/
    ```
 
 2. เปิด Deadline Monitor → **Tools → Configure Event Plugins**

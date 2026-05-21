@@ -25,6 +25,9 @@ deadline-event/
 ├── SetJobsEnv/
 │   ├── SetJobsEnv.py
 │   └── SetJobsEnv.param
+├── PPIstartup/
+│   ├── PPIstartup.py
+│   └── PPIstartup.param
 └── _backup/                # Old versions — do not touch
 ```
 
@@ -105,6 +108,25 @@ Deletes all `.tmp` files in each of the job's output directories. Uses `OnSlaveS
 Fires on `OnJobSubmitted` for all jobs. Injects environment variables into the job's environment at submit time.
 
 **Config:** `EnvKeys` — semicolon-separated `KEY=VALUE` pairs (e.g. `OCIO=/path/to/config.ocio;MY_VAR=1`). Uses `job.SetJobEnvironmentKeyValue()` + `RepositoryUtils.SaveJob()`.
+
+## PPIstartup
+
+Fires on `OnJobSubmitted` for `MayaBatch` and `MayaCmd` jobs whose name starts with a configurable prefix (default `JJK`).
+
+**Logic flow:**
+1. Skip if plugin is not `MayaBatch` / `MayaCmd`
+2. Skip if `job.JobName` does not start with `JobNamePrefix` (case-sensitive)
+3. Append script directory (from `UserSetupMelPath`) to `MAYA_SCRIPT_PATH` job environment — Maya auto-sources `userSetup.mel` from all directories in this path at startup
+4. Auto-set `OutputFilePath` (Plugin Info) to `{ProjectPath}/render/{SceneName}/rev####/` — scans existing `rev\d{4}` subdirs and increments; starts at `rev0001` if none exist
+5. `RepositoryUtils.SaveJob(job)` once at end
+
+**Key notes:**
+- `SetJobEnvironmentKeyValue` auto-saves immediately (no SaveJob needed for env vars)
+- `SetJobPluginInfoKeyValue` requires explicit `RepositoryUtils.SaveJob()` to persist
+- `OutputDirectory0` (Job Info display field) **cannot** be changed from an event plugin — Deadline API limitation; `OutputFilePath` (the actual render path used by MayaCmd as `-rd`) is correctly set
+- Uses `import re` for `re.match(r'^rev\d{4}$', d)` when scanning rev dirs
+
+**Key plugin info keys read/written:** `ProjectPath`, `SceneFile`, `OutputFilePath`
 
 ## .param File Format
 
