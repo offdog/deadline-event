@@ -146,27 +146,43 @@ Inject environment variable เข้าไปใน job ตอน submit เห
 
 Inject `userSetup.mel` ของ PPI studio เข้า Maya job อัตโนมัติตอน submit และกำหนด output path แบบ auto-increment rev
 
-**Triggers:** `OnJobSubmitted` — เฉพาะ plugin `MayaBatch` และ `MayaCmd` ที่ชื่อ job ขึ้นต้นด้วย prefix ที่กำหนด (รองรับสูงสุด 3 entries)
+**Triggers:** `OnJobSubmitted` — เฉพาะ plugin `MayaBatch` และ `MayaCmd` ที่มี job extra info `Pipeline=ppi`
 
 #### Logic
 
-1. Loop entries 1–3: หา prefix แรกที่ match ชื่อ job (first match wins) — ถ้าไม่ match เลย → skip
-2. เพิ่ม directory ของ `userSetup.mel` (จาก MEL Path ที่ match) เข้า `MAYA_SCRIPT_PATH` — Maya จะ auto-source `userSetup.mel` จาก directory นั้นตอน startup
-3. กำหนด `OutputFilePath` เป็น `{ProjectPath}/render/{SceneName}/rev####/` โดย scan folder จริงแล้ว auto-increment rev
+1. `SubmitMayaToDeadline.mel` อ่าน `ppi_projects.txt` จาก folder เดียวกัน แล้ว detect project code จาก `ProjectPath`
+2. Submitter เขียน debug marker `ExtraInfoKeyValue6=PPISubmitterVersion=2026-06-13-v3`
+3. ถ้า match จะเขียน `ExtraInfoKeyValue7=Pipeline=ppi` และ `ExtraInfoKeyValue8=PPIProject=<code>` พร้อม override output path ก่อน submit
+4. `PPIstartup.py` อ่าน extra info ใน `OnJobSubmitted`; ถ้า extra info ยังว่างจะ fallback จาก project code config / job name / `ProjectPath`
+5. ใช้ `PPIProject` ไป match config entries 1–3 แล้วเพิ่ม directory ของ `userSetup.mel` เข้า `MAYA_SCRIPT_PATH`
+6. กำหนด `OutputFilePath` fallback เป็น `{ProjectPath}/render/{SceneName}/rev####/` โดย scan folder จริงแล้ว auto-increment rev
 
-> **หมายเหตุ:** `OutputDirectory0` (แสดงใน Deadline Monitor) ไม่สามารถเปลี่ยนได้จาก event plugin — เป็น limitation ของ Deadline API แต่ `OutputFilePath` ที่ใช้เป็น `-rd` flag จริงใน MayaCmd ถูกต้อง
+> **หมายเหตุ:** `OutputDirectory0` (แสดงใน Deadline Monitor) ต้องถูกตั้งจาก Maya submitter ก่อน submit job เพราะ `JobOutputDirectories` เป็น read-only ใน event plugin; local copy `PPIstartup/SubmitMayaToDeadline.mel` จะ override output path เฉพาะ project code ที่อยู่ใน `ppi_projects.txt` ส่วนโปรเจคอื่นยังใช้ `//berry/output/RENDERS/{username}`
+
+#### PPI Submitter Verification
+
+หลัง submit งาน PPI ให้ดู **Job Extra Info → Extra Info Key/Value Pairs**:
+
+| Key | Expected Value | Meaning |
+|---|---|---|
+| `PPIDetectProjectPath` | Maya project path เช่น `P:/JJK/...` | ค่า `ProjectPath` ที่ submitter ใช้ detect |
+| `PPISubmitterVersion` | `2026-06-13-v3` | ยืนยันว่า Maya ใช้ submitter ตัวใหม่ |
+| `Pipeline` | `ppi` | งานนี้ถูก tag เป็น PPI |
+| `PPIProject` | `JJK` หรือ project code อื่น | project code ที่ match จาก `ppi_projects.txt` |
+
+ถ้าเห็น `PPISubmitterVersion` แต่ไม่มี `Pipeline=ppi` ให้ตรวจ `PPIDetectProjectPath` และ `ppi_projects.txt`; ถ้าไม่เห็น `PPISubmitterVersion` แปลว่ายังไม่ได้ reload/deploy submitter ล่าสุดใน Maya
 
 #### Configuration
 
 | Field | Default | Description |
 |---|---|---|
 | Event State | Global Enabled | เปิด/ปิด plugin |
-| Prefix 1 | `JJK` | Job name prefix #1 (case-sensitive) — เว้นว่างเพื่อ disable |
-| UserSetup MEL Path 1 | `M:/_tech/mayaScript/ppi/jjk/startup/userSetup.mel` | Path ไปยัง `userSetup.mel` สำหรับ Prefix 1 |
-| Prefix 2 | _(ว่าง)_ | Job name prefix #2 — เว้นว่างเพื่อ disable |
-| UserSetup MEL Path 2 | _(ว่าง)_ | Path ไปยัง `userSetup.mel` สำหรับ Prefix 2 |
-| Prefix 3 | _(ว่าง)_ | Job name prefix #3 — เว้นว่างเพื่อ disable |
-| UserSetup MEL Path 3 | _(ว่าง)_ | Path ไปยัง `userSetup.mel` สำหรับ Prefix 3 |
+| PPI Project Code 1 | `JJK` | Project code จาก extra info `PPIProject` |
+| UserSetup MEL Path 1 | `M:/_tech/mayaScript/ppi/jjk/startup/userSetup.mel` | Path ไปยัง `userSetup.mel` สำหรับ Project Code 1 |
+| PPI Project Code 2 | _(ว่าง)_ | Project code เพิ่มเติม |
+| UserSetup MEL Path 2 | _(ว่าง)_ | Path ไปยัง `userSetup.mel` สำหรับ Project Code 2 |
+| PPI Project Code 3 | _(ว่าง)_ | Project code เพิ่มเติม |
+| UserSetup MEL Path 3 | _(ว่าง)_ | Path ไปยัง `userSetup.mel` สำหรับ Project Code 3 |
 
 #### ตัวอย่าง Output Path
 
@@ -190,11 +206,17 @@ Job มี `ProjectPath = M:/JJK`, `SceneFile = shot010.ma`:
    <DeadlineRepository>/custom/events/PPIstartup/
    ```
 
-2. เปิด Deadline Monitor → **Tools → Configure Event Plugins**
+2. สำหรับ Maya PPI submitter ให้ copy ไฟล์ไปวางคู่กัน:
+   ```
+   <DeadlineRepository>/submission/Maya/Main/SubmitMayaToDeadline.mel
+   <DeadlineRepository>/submission/Maya/Main/ppi_projects.txt
+   ```
 
-3. ตั้งค่า plugin แต่ละตัว แล้ว Save
+3. เปิด Deadline Monitor → **Tools → Configure Event Plugins**
 
-4. ดู log ได้ใน Deadline Monitor → **View → Logs → Event Logs**
+4. ตั้งค่า plugin แต่ละตัว แล้ว Save
+
+5. ดู log ได้ใน Deadline Monitor → **View → Logs → Event Logs**
 
 ---
 

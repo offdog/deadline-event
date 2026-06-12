@@ -9,11 +9,11 @@ Description=When this event plugin is active
 
 [Prefix1]
 Type=String
-Label=Prefix 1
+Label=PPI Project Code 1
 Category=PPI Startup Settings
 CategoryIndex=1
 Default=JJK
-Description=Job name prefix #1 (case-sensitive). Leave blank to disable this entry.
+Description=PPI project code #1 from job extra info PPIProject (case-sensitive). Leave blank to disable this entry.
 
 [MelPath1]
 Type=String
@@ -21,15 +21,15 @@ Label=UserSetup MEL Path 1
 Category=PPI Startup Settings
 CategoryIndex=2
 Default=M:/_tech/mayaScript/ppi/jjk/startup/userSetup.mel
-Description=Path to userSetup.mel for Prefix 1. Plugin extracts directory and adds to MAYA_SCRIPT_PATH.
+Description=Path to userSetup.mel for PPI Project Code 1. Plugin extracts directory and adds to MAYA_SCRIPT_PATH.
 
 [Prefix2]
 Type=String
-Label=Prefix 2
+Label=PPI Project Code 2
 Category=PPI Startup Settings
 CategoryIndex=3
 Default=
-Description=Job name prefix #2 (case-sensitive). Leave blank to disable.
+Description=PPI project code #2 from job extra info PPIProject (case-sensitive). Leave blank to disable.
 
 [MelPath2]
 Type=String
@@ -37,15 +37,15 @@ Label=UserSetup MEL Path 2
 Category=PPI Startup Settings
 CategoryIndex=4
 Default=
-Description=Path to userSetup.mel for Prefix 2.
+Description=Path to userSetup.mel for PPI Project Code 2.
 
 [Prefix3]
 Type=String
-Label=Prefix 3
+Label=PPI Project Code 3
 Category=PPI Startup Settings
 CategoryIndex=5
 Default=
-Description=Job name prefix #3 (case-sensitive). Leave blank to disable.
+Description=PPI project code #3 from job extra info PPIProject (case-sensitive). Leave blank to disable.
 
 [MelPath3]
 Type=String
@@ -53,4 +53,4 @@ Label=UserSetup MEL Path 3
 Category=PPI Startup Settings
 CategoryIndex=6
 Default=
-Description=Path to userSetup.mel for Prefix 3.
+Description=Path to userSetup.mel for PPI Project Code 3.
