@@ -70,6 +70,43 @@ class PPIstartupEvent(DeadlineEventListener):
 
         return None, None, None
 
+    def _maya_major_version(self, job):
+        rawVersion = (job.GetJobPluginInfoKeyValue("Version") or "").strip()
+        match = re.match(r'^(\d{4})', rawVersion)
+        if match:
+            return match.group(1)
+        return ""
+
+    def _apply_pool_and_group(self, job):
+        ppiGroup = self.GetConfigEntryWithDefault("PPIGroup", "ppi").strip()
+        if ppiGroup:
+            job.JobGroup = ppiGroup
+            self.LogInfo("[PPIstartup] Group - Set to '{}'".format(ppiGroup))
+        else:
+            self.LogWarning("[PPIstartup] Group - PPIGroup config is empty; keeping existing group")
+
+        mayaVersion = self._maya_major_version(job)
+        poolByVersion = {
+            "2023": self.GetConfigEntryWithDefault("Maya2023Pool", "maya2023-arnold522").strip(),
+            "2024": self.GetConfigEntryWithDefault("Maya2024Pool", "maya2024-arnold5341").strip(),
+            "2025": self.GetConfigEntryWithDefault("Maya2025Pool", "maya2025-arnold545").strip(),
+        }
+
+        if mayaVersion not in poolByVersion:
+            rawVersion = (job.GetJobPluginInfoKeyValue("Version") or "").strip()
+            self.LogWarning("[PPIstartup] Pool - Unsupported Maya Version '{}'; keeping existing pool".format(
+                rawVersion))
+            return
+
+        mayaPool = poolByVersion[mayaVersion]
+        if not mayaPool:
+            self.LogWarning("[PPIstartup] Pool - Maya {} pool config is empty; keeping existing pool".format(
+                mayaVersion))
+            return
+
+        job.JobPool = mayaPool
+        self.LogInfo("[PPIstartup] Pool - Set to '{}' for Maya {}".format(mayaPool, mayaVersion))
+
     def OnJobSubmitted(self, job):
         self.LogInfo("[PPIstartup] OnJobSubmitted - JobID: {} Name: '{}' Plugin: {}".format(
             job.JobId, job.JobName, job.JobPlugin))
@@ -99,6 +136,9 @@ class PPIstartupEvent(DeadlineEventListener):
             return
 
         self.LogInfo("[PPIstartup] Matched PPI project '{}' (entry {})".format(projectCode, entryIndex))
+
+        # --- Pool / Group ---
+        self._apply_pool_and_group(job)
 
         # --- MAYA_SCRIPT_PATH ---
         melPath = matchedMelPath.replace("\\", "/")

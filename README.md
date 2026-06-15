@@ -225,6 +225,24 @@ Job มี `ProjectPath = M:/JJK`, `SceneFile = shot010.ma`:
 - ทุก section ใน `.param` file ต้องมี `Type=` — ถ้าขาดจะเกิด warning ตอน Deadline โหลด plugin
 - `[About]` ใช้ `Type=Label` + `Default=` สำหรับ read-only display text (`Value=` ไม่ถูก recognize)
 
+## PPI Current Behavior Notes
+
+- PPI detection is based on `Pipeline=ppi` / `PPIProject=<code>` extra info first, then fallback project-code matching from the event plugin config.
+- PPI Maya render submissions force `ChunkSize=10`; non-PPI jobs keep the submitted UI/persistent task-size value.
+- Matched PPI jobs force Deadline `Group` from Event GUI config `PPIGroup`, default `ppi`.
+- Matched PPI jobs force Deadline `Pool` by Maya version from Event GUI config:
+  - `Maya2023Pool`, default `maya2023-arnold522`
+  - `Maya2024Pool`, default `maya2024-arnold5341`
+  - `Maya2025Pool`, default `maya2025-arnold545`
+- Event Logs should show successful pool/group selection, for example:
+
+```text
+[PPIstartup] Group - Set to 'ppi'
+[PPIstartup] Pool - Set to 'maya2024-arnold5341' for Maya 2024
+```
+
+If the Maya version is missing or unsupported, the event keeps the submitted pool and logs a warning.
+
 ## Requirements
 
 - Thinkbox Deadline 10+

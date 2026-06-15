@@ -54,3 +54,35 @@ Category=PPI Startup Settings
 CategoryIndex=6
 Default=
 Description=Path to userSetup.mel for PPI Project Code 3.
+
+[PPIGroup]
+Type=String
+Label=PPI Group
+Category=PPI Pool/Group Settings
+CategoryIndex=7
+Default=ppi
+Description=Group to force for matched PPI jobs. Leave blank to keep the submitted group.
+
+[Maya2023Pool]
+Type=String
+Label=Maya 2023 Pool
+Category=PPI Pool/Group Settings
+CategoryIndex=8
+Default=maya2023-arnold522
+Description=Pool to force for matched PPI jobs submitted from Maya 2023. Leave blank to keep the submitted pool.
+
+[Maya2024Pool]
+Type=String
+Label=Maya 2024 Pool
+Category=PPI Pool/Group Settings
+CategoryIndex=9
+Default=maya2024-arnold5341
+Description=Pool to force for matched PPI jobs submitted from Maya 2024. Leave blank to keep the submitted pool.
+
+[Maya2025Pool]
+Type=String
+Label=Maya 2025 Pool
+Category=PPI Pool/Group Settings
+CategoryIndex=10
+Default=maya2025-arnold545
+Description=Pool to force for matched PPI jobs submitted from Maya 2025. Leave blank to keep the submitted pool.

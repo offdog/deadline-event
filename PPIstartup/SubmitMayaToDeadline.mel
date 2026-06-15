@@ -3575,12 +3575,18 @@ proc string WriteJobFilesAndSubmit( string $renderer, int $showDialog, int $regi
 					fprint $fileId ( "Frames=" + `textFieldGrp -q -text $field` + "\n" );
 					
 					$field = "frw_FrameGroup_" + $currentRenderLayer;
-					fprint $fileId ( "ChunkSize=" + `intSliderGrp -q -v $field` + "\n" );
+					int $submitLayerChunkSize = `intSliderGrp -q -v $field`;
+					if( $ppiProjectCode != "" )
+						$submitLayerChunkSize = 10;
+					fprint $fileId ( "ChunkSize=" + $submitLayerChunkSize + "\n" );
 				}
 				else
 				{
 					fprint $fileId ( "Frames=" + $frameList + "\n" );
-					fprint $fileId ( "ChunkSize=" + `intSliderGrp -q -v frw_FrameGroup` + "\n" );
+					int $submitFrameChunkSize = `intSliderGrp -q -v frw_FrameGroup`;
+					if( $ppiProjectCode != "" )
+						$submitFrameChunkSize = 10;
+					fprint $fileId ( "ChunkSize=" + $submitFrameChunkSize + "\n" );
 				}
 			}
 			else
@@ -3597,7 +3603,10 @@ proc string WriteJobFilesAndSubmit( string $renderer, int $showDialog, int $regi
 				// Regular renders and Arnold exports can be split across machines, but other exports (AFAIK) must be done on a single machine.
 				if( $jobType == $MayaRenderJobType || $jobType == $ArnoldExportJobType || $jobType == $MaxwellExportJobType || $jobType == $RendermanExportJobType || $jobType == $RedshiftExportJobType )
 				{
-					fprint $fileId ( "ChunkSize=" + `intSliderGrp -q -v frw_FrameGroup` + "\n" );
+					int $submitRenderChunkSize = `intSliderGrp -q -v frw_FrameGroup`;
+					if( $jobType == $MayaRenderJobType && $ppiProjectCode != "" )
+						$submitRenderChunkSize = 10;
+					fprint $fileId ( "ChunkSize=" + $submitRenderChunkSize + "\n" );
 				}
 				else
 				{

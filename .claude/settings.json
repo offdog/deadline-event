@@ -6,7 +6,9 @@
       "Bash(git add *)",
       "Bash(git commit -m ' *)",
       "Bash(git branch *)",
-      "Bash(git push *)"
+      "Bash(git push *)",
+      "Bash(git -C \"f:/projects/deadline-event\" add MayaOCIOFix/MayaOCIOFix.param CLAUDE.md README.md)",
+      "Bash(git -C f:/projects/deadline-event commit -m ' *)"
     ]
   }
 }

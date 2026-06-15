@@ -29,6 +29,7 @@ Submitter behavior:
 - Always writes `PPISubmitterVersion=2026-06-13-v3` for Maya render jobs as a deploy/reload marker.
 - Writes `Pipeline=ppi` and `PPIProject=<code>` only when project detection matches.
 - Overrides output path for PPI jobs before submit so `OutputDirectory0` and `OutputFilePath` can match.
+- Forces `ChunkSize=10` for PPI Maya render submissions at submit time; non-PPI jobs keep the submitted UI value.
 - Leaves non-PPI projects on the default `//berry/output/RENDERS/{username}` path.
 
 Event plugin behavior:
@@ -36,6 +37,11 @@ Event plugin behavior:
 - Runs only for `MayaBatch` and `MayaCmd`.
 - Prefers Deadline Extra Info: `Pipeline=ppi`, `PPIProject=<code>`.
 - Falls back to configured project code / job name / `ProjectPath` while rollout is in progress.
+- Forces matched PPI jobs to `Group=ppi` by default, configurable with `PPIGroup`.
+- Forces matched PPI job pools by Maya version, configurable with `Maya2023Pool`, `Maya2024Pool`, and `Maya2025Pool`.
+  - Maya 2023: `maya2023-arnold522`
+  - Maya 2024: `maya2024-arnold5341`
+  - Maya 2025: `maya2025-arnold545`
 - Adds the matching `userSetup.mel` directory to `MAYA_SCRIPT_PATH`.
 - Sets `OutputFilePath` as a fallback, but does not and cannot set `OutputDirectory0`.
 

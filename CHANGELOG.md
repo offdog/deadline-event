@@ -1,5 +1,21 @@
 # Changelog
 
+## 2026-06-15
+
+### Added
+
+- Added configurable PPI event settings for forced Deadline group and Maya-version pools:
+  - `PPIGroup=ppi`
+  - `Maya2023Pool=maya2023-arnold522`
+  - `Maya2024Pool=maya2024-arnold5341`
+  - `Maya2025Pool=maya2025-arnold545`
+- Added event logs that report the forced PPI group and selected Maya-version pool.
+
+### Changed
+
+- PPI Maya render submissions now force `ChunkSize=10` at submit time while non-PPI jobs keep the UI/persistent task-size behavior.
+- `PPIstartup.py` now forces matched PPI jobs to `Group=ppi` and selects `Pool` from the submitted Maya version.
+
 ## 2026-06-13
 
 ### Added
